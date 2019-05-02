@@ -9,6 +9,7 @@ with open("names.txt","r") as infile:
     nicknames=eval(infile.read())
 startdate = datetime(2019,2,6,21,10,10).timestamp()
 enddate = datetime(2019,5,2,10,9,0).timestamp()
+result = {k:list(filter(lambda x:x>startdate,v)) for k,v in result.items()}
 def corr(id1,id2,binsize):
     rec1=result[id1]
     rec2=result[id2]
@@ -100,7 +101,7 @@ partial_correlations *= d[:, np.newaxis]
 non_zero = (np.abs(np.triu(partial_correlations, k=1)) > 0.02)
 
 # Plot the nodes using the coordinates of our embedding
-plt.scatter(embedding[0], embedding[1], s=100 * d ** 2, c=labels,
+plt.scatter(embedding[0], embedding[1], s=100000* d ** 2, c=labels,
             cmap=plt.cm.nipy_spectral)
 
 # Plot the edges
@@ -109,12 +110,13 @@ start_idx, end_idx = np.where(non_zero)
 #            linen = (x0, y0), (x1, y1), ... (xm, ym)
 segments = [[embedding[:, start], embedding[:, stop]]
             for start, stop in zip(start_idx, end_idx)]
-values = np.abs(partial_correlations[non_zero])
+values = np.log(np.abs(partial_correlations[non_zero]))
+values -= values.min()
 lc = LineCollection(segments,
                     zorder=0, cmap=plt.cm.hot_r,
-                    norm=plt.Normalize(0, .7 * values.max()))
+                    norm=plt.Normalize(0, .8*values.max()))
 lc.set_array(values)
-lc.set_linewidths(15 * values)
+lc.set_linewidths(5 * values)
 ax.add_collection(lc)
 
 # Add a label to each node. The challenge here is that we want to
