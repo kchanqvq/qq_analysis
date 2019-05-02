@@ -4,11 +4,12 @@ import operator
 result={}
 with open("timestamps.txt","r") as infile:
     result=eval(infile.read())
+#result[994458697]=[]
 nicknames={}
 with open("names.txt","r") as infile:
     nicknames=eval(infile.read())
-startdate = datetime(2019,2,6,21,10,10).timestamp()
-enddate = datetime(2019,5,2,10,9,0).timestamp()
+startdate = datetime(2016,1,25,19,29,0).timestamp()
+enddate = datetime(2019,5,2,14,50,40).timestamp()
 result = {k:list(filter(lambda x:x>startdate,v)) for k,v in result.items()}
 def corr(id1,id2,binsize):
     rec1=result[id1]
@@ -54,8 +55,10 @@ for id1 in ids:
         #names.append(nicknames[id1])
         names.append(nicknames[id1]+"("+str(id1)+")")
         variation.append(np.histogram(rec,x)[0])
+print(len(names)," people")
 variation=np.array(variation)
 # #############################################################################
+#'''
 # Learn a graphical structure from the correlations
 edge_model = covariance.GraphicalLassoCV(cv=5)
 
@@ -65,10 +68,11 @@ X = variation.copy().T.astype("f")
 stdX = X.std(axis=0)
 
 edge_model.fit(X)
-
+import pickle
+pickle.dump((ids,names,edge_model),open("edge_model.pkl", 'wb'))
 # #############################################################################
 # Cluster using affinity propagation
-
+#'''
 _, labels = cluster.affinity_propagation(edge_model.covariance_)
 n_labels = labels.max()
 '''
@@ -88,7 +92,7 @@ node_position_model = manifold.LocallyLinearEmbedding(
 embedding = node_position_model.fit_transform(X.T).T
 # #############################################################################
 # Visualization
-plt.figure(1, facecolor='w', figsize=(100, 100))
+plt.figure(1, facecolor='w', figsize=(300, 300),dpi=1000)
 plt.clf()
 ax = plt.axes([0., 0., 1., 1.])
 plt.axis('off')
@@ -132,16 +136,16 @@ for index, (name, label, (x, y)) in enumerate(
     this_dy = dy[np.argmin(np.abs(dx))]
     if this_dx > 0:
         horizontalalignment = 'left'
-        x = x + .001
+        x = x + .0001
     else:
         horizontalalignment = 'right'
-        x = x - .001
+        x = x - .0001
     if this_dy > 0:
         verticalalignment = 'bottom'
-        y = y + .001
+        y = y + .0001
     else:
         verticalalignment = 'top'
-        y = y - .001
+        y = y - .0001
     plt.text(x, y, name, size=5,fontproperties=font,
              horizontalalignment=horizontalalignment,
              verticalalignment=verticalalignment,
@@ -155,4 +159,4 @@ plt.ylim(embedding[1].min() - .03 * embedding[1].ptp(),
          embedding[1].max() + .03 * embedding[1].ptp())
 
 #plt.show()
-plt.savefig("map2019-2.pdf")
+plt.savefig("map.pdf")
