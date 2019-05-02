@@ -2,14 +2,14 @@ from datetime import datetime
 import numpy as np
 import operator
 result={}
-with open("timestamps.txt","r") as infile:
+with open("mk_timestamps.txt","r") as infile:
     result=eval(infile.read())
 #result[994458697]=[]
 nicknames={}
-with open("names.txt","r") as infile:
+with open("mk_names.txt","r") as infile:
     nicknames=eval(infile.read())
-startdate = datetime(2016,1,25,19,29,0).timestamp()
-enddate = datetime(2019,5,2,14,50,40).timestamp()
+startdate = datetime(2017,8,25,19,29,0).timestamp()
+enddate = datetime(2019,5,2,16,50,40).timestamp()
 result = {k:list(filter(lambda x:x>startdate,v)) for k,v in result.items()}
 def corr(id1,id2,binsize):
     rec1=result[id1]
@@ -68,8 +68,8 @@ X = variation.copy().T.astype("f")
 stdX = X.std(axis=0)
 
 edge_model.fit(X)
-import pickle
-pickle.dump((ids,names,edge_model),open("edge_model.pkl", 'wb'))
+#import pickle
+#pickle.dump((ids,names,edge_model.covariance_),open("mk_model.pkl", 'wb'))
 # #############################################################################
 # Cluster using affinity propagation
 #'''
@@ -92,7 +92,7 @@ node_position_model = manifold.LocallyLinearEmbedding(
 embedding = node_position_model.fit_transform(X.T).T
 # #############################################################################
 # Visualization
-plt.figure(1, facecolor='w', figsize=(300, 300),dpi=1000)
+plt.figure(1, facecolor='w', figsize=(300, 300))
 plt.clf()
 ax = plt.axes([0., 0., 1., 1.])
 plt.axis('off')
@@ -136,16 +136,16 @@ for index, (name, label, (x, y)) in enumerate(
     this_dy = dy[np.argmin(np.abs(dx))]
     if this_dx > 0:
         horizontalalignment = 'left'
-        x = x + .0001
+        x = x + .0004
     else:
         horizontalalignment = 'right'
-        x = x - .0001
+        x = x - .0004
     if this_dy > 0:
         verticalalignment = 'bottom'
-        y = y + .0001
+        y = y + .0004
     else:
         verticalalignment = 'top'
-        y = y - .0001
+        y = y - .0004
     plt.text(x, y, name, size=5,fontproperties=font,
              horizontalalignment=horizontalalignment,
              verticalalignment=verticalalignment,
@@ -159,4 +159,4 @@ plt.ylim(embedding[1].min() - .03 * embedding[1].ptp(),
          embedding[1].max() + .03 * embedding[1].ptp())
 
 #plt.show()
-plt.savefig("map.pdf")
+plt.savefig("mk_map.pdf")

@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 result={}
-with open("复活的百度物理吧唯一.txt","r") as infile:
+with open("雾雨魔法店.txt","r") as infile:
     ln = infile.readline()
     count = 0
     while ln:
@@ -17,9 +17,15 @@ with open("复活的百度物理吧唯一.txt","r") as infile:
                 raise ValueError("s")
             date = datetime.strptime(ln[:secondspace], '%Y-%m-%d %H:%M:%S').timestamp()
             lastbra = ln.rfind("(")
+            qqno=None
             if lastbra<=0:
-                raise ValueError("l")
-            qqno = int(ln[lastbra+1:-2])
+                lastsharp = ln.rfind("<")
+                if lastsharp <=0:
+                    raise ValueError("l")
+                else:
+                    qqno=ln[lastsharp+1:-2]
+            else:
+                qqno = int(ln[lastbra+1:-2])
             if not qqno in result:
                 result[qqno]=[]
             result[qqno].append(date)
@@ -27,5 +33,5 @@ with open("复活的百度物理吧唯一.txt","r") as infile:
             pass
         finally:
             ln = infile.readline()
-with open("timestamps.txt","w") as outfile:
+with open("mk_timestamps.txt","w") as outfile:
     outfile.write(str(result))
